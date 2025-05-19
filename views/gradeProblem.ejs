@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/theme.css" />
+    <link rel="stylesheet" type="text/css" href="/profile.css" />
+    <title><%= title %></title>
+    <style>
+        .problem-content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .problem-header {
+            margin-bottom: 20px;
+        }
+        .problem-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .problem-meta {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .problem-statement {
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        .sample {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre;
+        }
+        .submit-button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .submit-button:hover {
+            background: var(--button-hover);
+        }
+        .limits {
+            margin: 10px 0;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <%- include("partials/header", {active: "problemset"}); %>
+    <%- include("partials/particles", {depth: 1}); %>
+
+    <div class="main-block">
+        <div class="problem-content">
+            <div class="problem-header">
+                <div class="problem-title"><%= title %></div>
+                <div class="problem-meta">
+                    Problem ID: <%= pid %>
+                    <% if (typeof points !== 'undefined') { %>
+                        | Points: <%= points %>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="limits">
+                Time limit: <%= tl %> ms | Memory limit: <%= ml %> MB
+            </div>
+
+            <div class="problem-statement">
+                <%- statement %>
+            </div>
+
+            <% if (inputtxt) { %>
+                <div class="section-title">Input</div>
+                <div class="input-format"><%- inputtxt %></div>
+            <% } %>
+
+            <% if (outputtxt) { %>
+                <div class="section-title">Output</div>
+                <div class="output-format"><%- outputtxt %></div>
+            <% } %>
+
+            <% if (samples && samples.length > 0) { %>
+                <div class="section-title">Examples</div>
+                <% JSON.parse(samples).forEach((sample, index) => { %>
+                    <div class="section-title">Example <%= index + 1 %></div>
+                    <div class="sample">Input:
+<%= sample.input %></div>
+                    <div class="sample">Output:
+<%= sample.output %></div>
+                    <% if (sample.explanation) { %>
+                        <div class="explanation">
+                            <strong>Explanation:</strong>
+                            <%= sample.explanation %>
+                        </div>
+                    <% } %>
+                <% }); %>
+            <% } %>
+
+            <a href="/grade/submit?problem=<%= pid %>">
+                <button class="submit-button">Submit Solution</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/theme.css" />
+    <link rel="stylesheet" type="text/css" href="/profile.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/rating-graph.js"></script>
+    <title>Rankings</title>
+    <style>
+      .rankings-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .rankings-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      
+      .rankings-table th,
+      .rankings-table td {
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .rankings-table th {
+        background: rgba(255, 255, 255, 0.1);
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9em;
+      }
+      
+      .rankings-table tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transition: background 0.3s ease;
+      }
+      
+      .rankings-table td a {
+        color: inherit;
+        text-decoration: none;
+      }
+      
+      .rankings-table td a:hover {
+        text-decoration: underline;
+      }
+      
+      .rank-cell {
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      
+      .top-3 {
+        font-size: 1.2em;
+      }
+      
+      .rank-1 { color: #FFD700; }
+      .rank-2 { color: #C0C0C0; }
+      .rank-3 { color: #CD7F32; }
+      
+      .score-cell {
+        font-family: monospace;
+      }
+      
+      .year-selector {
+        margin: 20px 0;
+        text-align: center;
+      }
+      
+      .year-selector select {
+        padding: 8px 15px;
+        font-size: 1em;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .info-message {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .rankings-table tr {
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+      }
+      
+      .rankings-table tr:nth-child(n) {
+        animation-delay: calc(n * 0.05s);
+      }
+
+      .rating-graph {
+        width: 100%;
+        height: 400px;
+        margin-top: 2em;
+      }
+
+      .user-graph {
+        display: none;
+        margin-top: 1em;
+        padding: 1em;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .show-graph {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("partials/header", {active: "rankings"}); %>
+    <%- include("partials/particles", {depth: 2}); %>
+    
+    <div class="rankings-container">
+      <div class="main-block">
+        <div class="title">Rankings</div>
+        <div class="subtitle">
+          <br>
+          <a href="https://docs.google.com/document/d/14CBtom9g0AKZkmncUQQJwV-dIwG54Arr26FnWfUcdvI/edit?usp=sharing" target="_blank">Learn about how rankings are formulated</a>
+        </div>
+      </div>
+
+      <div class="main-block">
+        <% if (locals.error) { %>
+          <div class="info-message">
+            <%= locals.error %>
+          </div>
+        <% } else if (locals.rankings && locals.rankings.length > 0) { %>
+          <table class="rankings-table">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Index</th>
+              <th>USACO</th>
+              <th>Codeforces</th>
+              <th>In-Houses</th>
+              <th>Graph</th>
+            </tr>
+            <% for (let i=0; i<locals.rankings.length; i++) { %>
+              <tr>
+                <td class="rank-cell centertext <%= i < 3 ? 'top-3 rank-' + (i+1) : '' %>">
+                  <%=locals.rankings[i].rank%>
+                </td>
+                <td class="name-cell centertext">
+                  <a href="/grade/profile/<%=locals.rankings[i].id%>"><%=locals.rankings[i].name%></a>
+                </td>
+                <td class="score-cell centertext"><%=locals.rankings[i].index.toFixed(1)%></td>
+                <td class="score-cell centertext"><%=locals.rankings[i].usaco.toFixed(1)%></td>
+                <td class="score-cell centertext"><%=locals.rankings[i].cf.toFixed(1)%></td>
+                <td class="score-cell centertext"><%=locals.rankings[i].inhouse.toFixed(1)%></td>
+                <td>
+                  <button class="button" onclick="toggleGraph('<%=locals.rankings[i].id%>')">Show/Hide</button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="7" class="user-graph" id="graph-<%=locals.rankings[i].id%>">
+                  <div class="rating-graph">
+                    <canvas id="ratingChart-<%=locals.rankings[i].id%>"></canvas>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </table>
+        <% } else { %>
+          <div class="info-message">
+            No rankings data available
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <script>
+      // Store all rating graphs
+      const ratingGraphs = new Map();
+      
+      function toggleGraph(userId) {
+        const graphRow = document.getElementById(`graph-${userId}`);
+        graphRow.classList.toggle('show-graph');
+        
+        // Initialize graph if not already done
+        if (!ratingGraphs.has(userId)) {
+          const data = generateDummyData(userId);
+          const graph = createRatingGraph(`ratingChart-${userId}`, data);
+          ratingGraphs.set(userId, graph);
+        }
+      }
+
+      // Listen for theme changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            // Update all visible graphs
+            ratingGraphs.forEach(graph => {
+              updateGraphTheme(graph);
+            });
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        attributes: true
+      });
+    </script>
+  </body>
+</html>

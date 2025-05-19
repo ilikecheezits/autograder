@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TJ Computer Team Grader</title>
+  <link rel="stylesheet" type="text/css" href="theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/graph-background.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+
+<body class="index-page">
+  <canvas id="graph-background"></canvas>
+  <section class="main">
+    <div class="bgbox">
+      <div id="title" class="title"><strong><em>TJCT GRADER</em></strong></div>
+      <br>
+      <div class="cnt_buttons">
+        <a class="button_link" id='login' href=<%=locals.loginurl%>>
+          <div class="button">
+            Enter
+          </div>
+        </a>
+        <a class="button_link" id='login' href="https://activities.tjhsst.edu/ict/">
+          <div class="button">
+            Back
+          </div>
+        </a>
+      </div>
+      <br>
+      <div class="cnt_buttons">
+        <a class="button_link" id='login' href='/grade/tjioilogin'>
+          <div class="button">
+            TJIOI Login
+          </div>
+        </a>
+      </div>
+    </div>
+    
+    <div class="subbox">
+      <div class="subtext">Welcome to the automatic grader for TJ Computer Team. Please note that this website is hosted
+        external to Director. Please email tjctgrader@gmail.com and message the officers if
+        you have any questions. </div>
+    </div>
+  </section>
+  <script src="/js/graph-background.js"></script>
+</body>
+
+</html>

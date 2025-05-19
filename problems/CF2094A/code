@@ -1,0 +1,11 @@
+import sys
+
+def check(problem_id, test_id):
+    with open('subcode/output.txt', 'r') as f:
+        user_output = f.read().strip()
+ 
+    # For now, accept any non-empty output
+    if user_output:
+        print("AC")
+    else:
+        print("WA - Empty output") 

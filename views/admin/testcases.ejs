@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cases Management</title>
+    <link rel="stylesheet" type="text/css" href="/theme.css" />
+    <style>
+        .testcases-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .upload-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+        }
+
+        .form-group input[type="file"] {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .testcases-list {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .testcase-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testcase-item:last-child {
+            border-bottom: none;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animated {
+            animation: fadeIn 0.3s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <%- include("../partials/header", {active: "admin"}); %>
+    <%- include("../partials/particles", {depth: 2}); %>
+
+    <div class="testcases-container">
+        <div class="main-block">
+            <div class="title">Test Cases Management</div>
+            
+            <div class="upload-form animated">
+                <h2>Upload Test Cases</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="problemId">Problem ID:</label>
+                        <input type="text" id="problemId" name="problemId" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="testNumber">Test Case Number:</label>
+                        <input type="number" id="testNumber" name="testNumber" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input">Input File:</label>
+                        <input type="file" id="input" name="input" accept=".txt" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="output">Output File:</label>
+                        <input type="file" id="output" name="output" accept=".txt" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Upload Test Cases</button>
+                </form>
+            </div>
+
+            <div class="testcases-list animated" style="animation-delay: 0.2s">
+                <h2>Existing Test Cases</h2>
+                <div id="testcasesList">
+                    <!-- Test cases will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/admin/testcases/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Test cases uploaded successfully!', 'success');
+                    loadTestCases(formData.get('problemId'));
+                } else {
+                    showMessage(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Error uploading test cases', 'error');
+            }
+        });
+
+        function showMessage(message, type) {
+            const div = document.createElement('div');
+            div.className = `${type}-message animated`;
+            div.textContent = message;
+            
+            const form = document.getElementById('uploadForm');
+            form.insertBefore(div, form.firstChild);
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        async function loadTestCases(problemId) {
+            try {
+                const response = await fetch(`/admin/testcases/${problemId}`);
+                const data = await response.json();
+                
+                const listElement = document.getElementById('testcasesList');
+                listElement.innerHTML = '';
+                
+                if (data.testcases.length === 0) {
+                    listElement.innerHTML = '<p>No test cases found for this problem.</p>';
+                    return;
+                }
+                
+                data.testcases.forEach(testcase => {
+                    const div = document.createElement('div');
+                    div.className = 'testcase-item animated';
+                    div.innerHTML = `
+                        <span>Test ${testcase.number} (${testcase.type})</span>
+                        <span>${testcase.name}</span>
+                    `;
+                    listElement.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading test cases:', error);
+            }
+        }
+
+        // Load test cases when problem ID changes
+        document.getElementById('problemId').addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadTestCases(e.target.value);
+            }
+        });
+    </script>
+</body>
+</html> 

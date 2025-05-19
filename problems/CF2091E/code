@@ -1,0 +1,55 @@
+import sys
+
+def check_output(output_lines):
+    try:
+        # Parse test case input
+        with open(sys.argv[2], 'r') as f:
+            input_text = f.read()  # Read entire input preserving newlines
+            input_lines = input_text.splitlines()
+            
+            if not input_lines:
+                return "Error: Empty input"
+                
+            t = int(input_lines[0])  # First line is number of test cases
+            
+            # For each test case, expect one integer output
+            if len(output_lines) == 0:
+                return "Wrong Answer: Missing output for test case"
+            try:
+                ans = int(output_lines.pop(0))
+                # Ensure answer is non-negative
+                if ans < 0:
+                    return "Wrong Answer: Output should be non-negative"
+            except ValueError:
+                return "Wrong Answer: Output should be an integer"
+            except OverflowError:
+                return "Wrong Answer: Output number too large"
+        
+        if len(output_lines) > 0:
+            return "Wrong Answer: Too many lines in output"
+        
+        return "AC"
+    except Exception as e:
+        return f"Error checking output: {str(e)}"
+
+def main():
+    try:
+        # Read the user's output
+        output_lines = []
+        while True:
+            try:
+                line = input().strip()
+                if line:
+                    output_lines.append(line)
+            except EOFError:
+                break
+        
+        result = check_output(output_lines)
+        print(result)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main() 

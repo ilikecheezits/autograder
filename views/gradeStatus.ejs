@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../theme.css" />
+    <link rel="stylesheet" type="text/css" href="../profile.css" />
+    <title>Submissions</title>
+    <style>
+      .verdict-cell {
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+      }
+      .verdict-Accepted {
+        color: var(--success-color);
+      }
+      .verdict-Wrong.Answer, .verdict-Runtime.Error, .verdict-Time.Limit.Exceeded, .verdict-Memory.Limit.Exceeded {
+        color: var(--error-color);
+      }
+      .verdict-Running {
+        color: var(--accent-primary);
+      }
+      .verdict-System.Error {
+        color: #ff6b6b;
+      }
+      .verdict-detail {
+        font-family: monospace;
+        white-space: pre-wrap;
+        background: var(--code-bg);
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .pagination {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+      .pagination a {
+        padding: 0.5rem 1rem;
+        background: var(--button-bg);
+        color: var(--button-text);
+        border-radius: 4px;
+        text-decoration: none;
+      }
+      .pagination a:hover {
+        background: var(--button-hover);
+      }
+      .submission-row {
+        cursor: pointer;
+      }
+      .submission-row:hover {
+        background: var(--table-header);
+      }
+      .submission-detail {
+        display: none;
+      }
+      .submission-detail.active {
+        display: table-row;
+      }
+      .submission-detail td {
+        padding: 0;
+      }
+      .submission-detail-content {
+        padding: 1rem;
+        background: var(--code-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("partials/header", {active: "submissions"}); %>
+    <%- include("partials/particles", {depth: 1}); %>
+
+    <div class="main-block">
+      <div class="title">
+        Submissions<% if (locals.viewAsAdmin == true) { %> - Viewing as Admin <%} %>
+      </div>
+    </div>
+    <div class="main-block" id="submissions">
+      <table>
+        <tr>
+          <th>Submission</th>
+          <% if (locals.viewAsAdmin == true) { %>
+          <th>User</th>
+          <% } %>
+          <th>Problem</th>
+          <th>Runtime</th>
+          <th>Verdict</th>
+        </tr>
+        <% for (let i=locals.submissions.length-1-(locals.page-1)*100; i>=Math.max(locals.submissions.length-locals.page*100, 0); i--) { %>
+        <tr class="submission-row" onclick="toggleDetail(<%=locals.submissions[i].id%>)">
+          <td>
+            <a href=<%="/grade/status/" + locals.submissions[i].id%>>
+							View #<%=locals.submissions[i].id%>
+            </a>
+          </td>
+          <% if (locals.viewAsAdmin == true) { %>
+						<td>
+							<a href=<%="/grade/profile/" + locals.submissions[i].user%>>
+								<%=locals.submissions[i].user%>
+							</a>
+						</td>
+          <% } %>
+          <td>
+            <a href=<%="/grade/problemset/" + locals.submissions[i].problemid%>>
+							<%=locals.submissions[i].problemname%>
+            </a>
+          </td>
+          <td>
+						<%=locals.submissions[i].runtime%> ms
+					</td>
+          <td class="verdict-cell verdict-<%=locals.submissions[i].verdict.replace(/\s+/g, '.')%>">
+						<%=locals.submissions[i].verdict%>
+					</td>
+        </tr>
+        <tr id="detail-<%=locals.submissions[i].id%>" class="submission-detail">
+          <td colspan="5">
+            <div class="submission-detail-content">
+              <% if (locals.submissions[i].output) { %>
+                <div class="verdict-detail"><%=locals.submissions[i].output%></div>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+        <% } %>
+      </table>
+      <div class="pagination">
+        <% if (locals.page > 1) { %>
+          <a href=<%="/grade/status/?page=" + (parseInt(locals.page)-1)%>>Previous Page</a>
+        <% } %>
+        <a href=<%="/grade/status/?page=" + (parseInt(locals.page)+1)%>>Next Page</a>
+      </div>
+    </div>
+
+    <script>
+    function toggleDetail(id) {
+        const detailRow = document.getElementById(`detail-${id}`);
+        if (detailRow) {
+            detailRow.classList.toggle('active');
+        }
+    }
+    </script>
+  </body>
+</html>

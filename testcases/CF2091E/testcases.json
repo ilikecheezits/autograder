@@ -1,0 +1,22 @@
+[
+    {
+        "input": "5\n1 2 3 4 5\n",
+        "output": "15\n",
+        "explanation": "Basic test case with sorted array"
+    },
+    {
+        "input": "3\n3 1 2\n",
+        "output": "6\n",
+        "explanation": "Test case with unsorted array"
+    },
+    {
+        "input": "1\n1000000000\n",
+        "output": "1000000000\n",
+        "explanation": "Maximum single number test"
+    },
+    {
+        "input": "10\n1 3 5 7 9 2 4 6 8 10\n",
+        "output": "55\n",
+        "explanation": "Larger test case with mixed order"
+    }
+] 

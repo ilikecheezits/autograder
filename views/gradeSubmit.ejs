@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../theme.css" />
+    <link rel="stylesheet" type="text/css" href="../profile.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ext-language_tools.js"></script>
+    <title>Submit</title>
+    <style>
+      #editor {
+        width: 100%;
+        height: 400px;
+        font-size: 14px;
+        margin-bottom: 1em;
+        border-radius: 4px;
+        display: none;
+      }
+      #codeinput {
+        width: 100%;
+        height: 400px;
+        font-size: 14px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+        margin-bottom: 1em;
+      }
+      .editor-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1em;
+      }
+      .editor-controls select {
+        margin-right: 1em;
+        padding: 0.5em;
+        font-size: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+      #problemid {
+        width: 300px;
+      }
+      #lang {
+        width: 120px;
+      }
+      .toggle-editor {
+        background: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .toggle-editor:hover {
+        background: var(--button-hover);
+      }
+      .submit-controls {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 1em;
+        margin-top: 1em;
+        padding: 0.5em 2em;
+      }
+      /* Style the dropdown options */
+      .editor-controls select option {
+        padding: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+      /* Hide the default file input */
+      input[type="file"] {
+        display: none;
+      }
+      /* Style the custom file upload button */
+      .custom-file-upload {
+        background: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        padding: 0.75em 1.5em;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+      }
+      .custom-file-upload:hover {
+        background: var(--button-hover);
+      }
+      /* Style the submit button */
+      .submit-button {
+        background: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        padding: 0.75em 1.5em;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+      }
+      .submit-button:hover {
+        background: var(--button-hover);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("partials/header", {active: "submit"}); %>
+    <%- include("partials/particles", {depth: 1}); %>
+
+    <div class="main-block">
+      <div class="title">Submit</div>
+      <div class="problem-text">
+        Java users, make sure you are using <a href="https://docs.google.com/document/d/17r0fh2rezqDhNoCoUtwVtExn8hRml0BjeAqxQZk9MCs/edit?usp=sharing" target="_blank">package "subcode" and naming the
+        class "test"</a>
+      </div>
+    </div>
+    <div class="main-block">
+      <form action="/grade/submit" method="POST" enctype="multipart/form-data">
+        <div class="editor-controls">
+          <div>
+            <select id="problemid" name="problemid">
+              <% for (let i=0; i<locals.problem.length; i++) { %>
+                <option value=<%= locals.problem[i].pid %> <% if(locals.problem[i].pid==locals.problemid) { %> selected  <% } %> > <%= locals.problem[i].pid + " - " + locals.problem[i].name %> </option>
+              <% } %>
+            </select>
+            <select id="lang" name="lang" onchange="updateEditorMode()">
+              <option value="cpp" <%= locals.lastlang === "cpp" ? "selected" : "" %>>C++</option>
+              <option value="java" <%= locals.lastlang === "java" ? "selected" : "" %>>Java</option>
+              <option value="python" <%= locals.lastlang === "python" ? "selected" : "" %>>Python</option>
+            </select>
+          </div>
+          <button type="button" class="toggle-editor" onclick="toggleEditor()">Switch Editor</button>
+        </div>
+
+        <div id="editor"></div>
+        <textarea
+          id="codeinput"
+          name="code"
+          spellcheck="false"
+          maxlength="60000"
+          placeholder=""></textarea>
+
+        <div class="submit-controls">
+          <label class="custom-file-upload">
+            <input type="file" name="files" accept=".cpp,.java,.py"/>
+            Choose File
+          </label>
+          <button class="submit-button" type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Enable Ace language tools globally
+      ace.require("ace/ext/language_tools");
+      
+      let editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/c_cpp");
+      
+      // Set up Ace editor with correct configuration
+      editor.setOptions({
+        fontSize: "14px",
+        showPrintMargin: false,  // Remove the vertical line
+        wrap: true,  // Enable word wrapping
+        behavioursEnabled: true,  // Enable auto-pairing of brackets, quotes, etc.
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: true
+      });
+
+      // Sync editor content with textarea
+      editor.getSession().on("change", function() {
+        document.getElementById("codeinput").value = editor.getSession().getValue();
+      });
+
+      function updateEditorMode() {
+        const lang = document.getElementById("lang").value;
+        const modeMap = {
+          'cpp': 'c_cpp',
+          'java': 'java',
+          'python': 'python'
+        };
+        editor.session.setMode("ace/mode/" + modeMap[lang]);
+      }
+
+      let isAceEditor = false;
+      function toggleEditor() {
+        const aceEditor = document.getElementById("editor");
+        const plainEditor = document.getElementById("codeinput");
+        
+        isAceEditor = !isAceEditor;
+        if (isAceEditor) {
+          aceEditor.style.display = "block";
+          plainEditor.style.display = "none";
+          editor.setValue(plainEditor.value);
+          editor.clearSelection();
+        } else {
+          aceEditor.style.display = "none";
+          plainEditor.style.display = "block";
+          plainEditor.value = editor.getValue();
+        }
+      }
+
+      // Handle tab in plain textarea
+      document.getElementById("codeinput").addEventListener("keydown", function (e) {
+        const max = 60000;
+        const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];
+        if (this.value.length >= max && !allowed.includes(e.key)) {
+          e.preventDefault();
+          return;
+        }
+        if (e.key === "Tab") {
+          e.preventDefault();
+          const start = this.selectionStart;
+          const end = this.selectionEnd;
+          this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+          this.selectionStart = this.selectionEnd = start + 4;
+        }
+      });
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,17 @@
+[
+  {
+    "input": "1\n",
+    "output": "1\n",
+    "explanation": "Minimum input test"
+  },
+  {
+    "input": "100\n",
+    "output": "100\n",
+    "explanation": "Medium size input test"
+  },
+  {
+    "input": "1000000000\n",
+    "output": "1000000000\n",
+    "explanation": "Maximum input test (typical CF constraint)"
+  }
+]

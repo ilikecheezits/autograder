@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="theme.css" />
+  <link rel="stylesheet" type="text/css" href="/css/graph-background.css" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap" />
+  <title>Login</title>
+</head>
+<body class="login-page">
+  <canvas id="graph-background"></canvas>
+  <div class="bgbox">
+    <div class="title"><strong>Login</strong></div>
+    <div class="subbox">
+      <div class="subtext">
+        <form action="/login" method="POST">
+          <label for="username">Username:</label><br>
+          <input type="text" name="username" id="username" maxlength="100" required><br><br>
+          <div class="cnt_buttons">
+            <button class="button" type="submit">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/js/graph-background.js"></script>
+</body>
+</html> 

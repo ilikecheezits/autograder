@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../theme.css" />
+    <link rel="stylesheet" type="text/css" href="../profile.css" />
+    <title>Problem Set</title>
+    <style>
+      .problem-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      .problem-list th, .problem-list td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .problem-list th {
+        background-color: var(--bg-secondary);
+        font-weight: bold;
+      }
+      .problem-list tr:hover {
+        background-color: var(--bg-hover);
+      }
+      .problem-link {
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+      .problem-link:hover {
+        color: var(--link-hover);
+      }
+      .difficulty {
+        font-weight: bold;
+      }
+      .difficulty-easy {
+        color: #00c853;
+      }
+      .difficulty-medium {
+        color: #ffd600;
+      }
+      .difficulty-hard {
+        color: #ff3d00;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("partials/header", {active: "problemset"}); %>
+    <%- include("partials/particles", {depth: 1}); %>
+
+    <div class="main-block">
+      <div class="title">Problem Set</div>
+      <table class="problem-list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Difficulty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% problems.forEach(function(problem) { %>
+            <tr>
+              <td><a href="/grade/problemset/<%= problem.pid %>" class="problem-link"><%= problem.pid %></a></td>
+              <td><a href="/grade/problemset/<%= problem.pid %>" class="problem-link"><%= problem.name %></a></td>
+              <td>
+                <% 
+                let difficultyClass = '';
+                if (problem.points < 1300) difficultyClass = 'difficulty-easy';
+                else if (problem.points < 1700) difficultyClass = 'difficulty-medium';
+                else difficultyClass = 'difficulty-hard';
+                %>
+                <span class="difficulty <%= difficultyClass %>"><%= problem.points %></span>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

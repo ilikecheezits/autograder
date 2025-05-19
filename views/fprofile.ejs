@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../profile.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../js/rating-graph.js"></script>
+    <title>Profile</title>
+    <style>
+      .rating-graph {
+        width: 100%;
+        height: 400px;
+        margin-top: 2em;
+      }
+    </style>
+</head>
+<body>
+    <%- include("partials/header"); %>
+    <%- include("partials/particles", {depth: 2}); %>
+
+    <div id="mainContent">
+        <div id="subContent">
+          <div class="info-block">
+            <div class="title"><p>Profile</p></div>
+            <div class="userinfo">Name: <%=locals.name%></div>
+            <div class="userinfo">Username: <%=locals.username%></div>
+            <% if (locals.admin) { %>
+                <div class="statsInfo">USACO Division: <%=locals.usaco%></div>
+                <div class="statsInfo">Codeforces Handle: <%=locals.cf%></div>
+            <% } %>
+            <div class="rating-graph">
+              <canvas id="ratingChart"></canvas>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script>
+      // Initialize the rating graph
+      let ratingGraph;
+      
+      function initGraph() {
+        const data = generateDummyData('<%=locals.userid%>');
+        ratingGraph = createRatingGraph('ratingChart', data);
+      }
+
+      // Update graph when theme changes
+      document.addEventListener('DOMContentLoaded', () => {
+        initGraph();
+      });
+
+      // Listen for theme changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            updateGraphTheme(ratingGraph);
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        attributes: true
+      });
+    </script>
+</body>
+</html>

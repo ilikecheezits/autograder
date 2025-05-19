@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="../../../theme.css" />
+  <link rel="stylesheet" type="text/css" href="../../../profile.css"/>
+  <title>Standings</title>
+  <style>
+    .accepted { color: var(--success-color) !important; }
+    .rejected { color: var(--error-color) !important; }
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    .standings-table th,
+    .standings-table td {
+      padding: 0.75em;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+    .standings-table th {
+      background-color: var(--table-header);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .standings-table td {
+      background-color: var(--table-bg);
+      color: var(--text-primary);
+    }
+    .standings-table tr:hover td {
+      background-color: var(--bg-secondary);
+    }
+    .standings-table a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .standings-table a:hover {
+      color: var(--accent-secondary);
+    }
+  </style>
+</head>
+<body>
+  <%- include("partials/header"); %>
+  <%- include("partials/contestNavbar", {active: "standings", title: locals.title, user: locals.user, cid: locals.cid}); %>
+  <%- include("partials/particles", {depth: 3}); %>
+
+  <div class="main-block">
+    <div class="title">Contest Standings</div>
+    <table class="standings-table">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Points</th>
+        <th>Penalty</th>
+        <% for (let i=0; i<locals.pnum; i++) { %>
+          <th><%= "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i] %></th>   
+        <% } %>	
+      </tr>
+      <% for (let i=0; i<locals.load.length; i++) { %>
+        <tr>
+          <td><%=locals.load[i].rank%></td>
+          <td><a href="/grade/contests/<%=locals.cid%>/status?user=<%=locals.load[i].id%>"><%=locals.load[i].name%></a></td>
+          <td><%=locals.load[i].solved%></td>
+          <td><%=locals.load[i].penalty%></td>
+          <% for (let j=0; j<locals.pnum; j++) { %>
+            <% if(locals.load[i].problems[j]>0) { %>
+              <td class="accepted"><%=locals.load[i].problems[j]%></td>
+            <% } else if(locals.load[i].problems[j]<0) { %>
+              <td class="rejected"><%=locals.load[i].problems[j]%></td>
+            <% } else { %>
+              <td><%=locals.load[i].problems[j]%></td>
+            <% } %>
+          <% } %>
+        </tr>
+      <% } %>
+    </table>
+  </div>
+</body>
+</html>
